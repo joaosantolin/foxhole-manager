@@ -1,36 +1,86 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Estoque de Guerra — Foxhole
 
-## Getting Started
+Ferramenta de gerenciamento de estoque e logística para regimentos de **Foxhole**, feita com **Next.js** (App Router) e **Prisma**.
 
-First, run the development server:
+## Funcionalidades
+
+- **Aba Depósitos**: cadastre locais de depósito no mapa (bunker base, relay station, seaport, etc.), com um cronômetro visual do ciclo de reabastecimento (3 dias) que muda de cor (verde → âmbar → vermelho) conforme o prazo se aproxima, e gerenciamento dos itens armazenados em cada um (adicionar, ajustar quantidade, remover).
+- **Aba Quadro de Tarefas**: um kanban simples com as colunas *A Fazer*, *Em Andamento* e *Concluído*, com arrastar e soltar (drag and drop), prioridades e descrição opcional.
+- Dados persistidos via **Prisma** (SQLite por padrão — fácil de trocar para Postgres/MySQL).
+
+## Pré-requisitos
+
+- Node.js 20+
+- npm
+
+## Configuração inicial
 
 ```bash
+# 1. Instale as dependências (isso também roda "prisma generate" automaticamente)
+npm install
+
+# 2. Crie o banco de dados SQLite e aplique o schema
+npx prisma migrate dev --name init
+
+# 3. (Opcional) Popule com dados de exemplo
+npm run db:seed
+
+# 4. Rode o servidor de desenvolvimento
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Acesse **http://localhost:3000**.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+> O arquivo `.env` já vem configurado com `DATABASE_URL="file:./dev.db"` (SQLite local). Não é necessário nenhum serviço externo para rodar o projeto.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Trocando para Postgres/MySQL (opcional)
 
-## Learn More
+Se quiser usar um banco de verdade (por exemplo para hospedar o app para o regimento inteiro usar), edite:
 
-To learn more about Next.js, take a look at the following resources:
+1. `prisma/schema.prisma` → troque `provider = "sqlite"` por `"postgresql"` (ou `"mysql"`).
+2. `.env` → aponte `DATABASE_URL` para a string de conexão do seu banco.
+3. Rode `npx prisma migrate dev --name init` novamente.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Estrutura do projeto
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```
+prisma/
+  schema.prisma       # Modelos: Depot, Item, Task
+  seed.mjs            # Dados de exemplo
+src/
+  app/
+    api/
+      depots/          # CRUD de depósitos + reset do timer
+      items/           # CRUD de itens
+      tasks/           # CRUD de tarefas (kanban)
+    page.tsx
+    layout.tsx
+    globals.css
+  components/
+    AppShell.tsx       # Navegação por abas
+    depots/            # UI da aba Depósitos (cards, timer, itens)
+    kanban/             # UI da aba Kanban (colunas, cards, drag and drop)
+  lib/
+    prisma.ts          # Cliente Prisma singleton
+    constants.ts        # Duração do refresh, categorias, labels
+    types.ts             # Tipos usados no frontend
+```
 
-## Deploy on Vercel
+## Modelo de dados
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- **Depot**: `name`, `region`, `lastRefillAt` (usado para calcular o cronômetro de 3 dias), `notes`, e sua lista de `items`.
+- **Item**: `name`, `quantity`, `category`, vinculado a um `Depot`.
+- **Task**: `title`, `description`, `status` (`TODO` / `IN_PROGRESS` / `DONE`), `priority` (`LOW` / `MEDIUM` / `HIGH`), `order` (posição dentro da coluna).
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+O cronômetro de cada depósito é calculado no navegador a partir de `lastRefillAt` + 3 dias — clique no ícone de atualizar no card do depósito sempre que ele for reabastecido no jogo, para reiniciar a contagem.
+
+## Scripts disponíveis
+
+| Comando | Descrição |
+|---|---|
+| `npm run dev` | Inicia o servidor de desenvolvimento |
+| `npm run build` | Build de produção |
+| `npm run start` | Roda o build de produção |
+| `npm run lint` | Roda o ESLint |
+| `npm run db:seed` | Popula o banco com dados de exemplo |
+| `npx prisma studio` | Abre uma interface visual para ver/editar os dados diretamente |

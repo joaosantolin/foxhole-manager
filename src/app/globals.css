@@ -1,26 +1,109 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Superfícies */
+  --bg: #12140e;
+  --bg-panel: #1a1d14;
+  --bg-panel-raised: #22261a;
+  --bg-input: #191d13;
+  --border: #3a3f2b;
+  --border-soft: #2a2e1f;
+
+  /* Texto */
+  --text: #e8e4d2;
+  --text-muted: #93987d;
+  --text-dim: #656a53;
+
+  /* Acentos funcionais (estado do abastecimento / prioridade) */
+  --accent-supply: #7a9a52;   /* estoque saudável / prazo longo */
+  --accent-warn: #cf9138;     /* atenção / prazo médio */
+  --accent-critical: #bb4a34; /* crítico / atrasado */
+  --accent-info: #5e84a8;     /* neutro / em andamento */
+
+  --font-display: var(--font-barlow-condensed);
+  --font-mono: var(--font-plex-mono);
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-bg: var(--bg);
+  --color-bg-panel: var(--bg-panel);
+  --color-bg-panel-raised: var(--bg-panel-raised);
+  --color-border: var(--border);
+  --color-text: var(--text);
+  --color-text-muted: var(--text-muted);
+  --color-accent-supply: var(--accent-supply);
+  --color-accent-warn: var(--accent-warn);
+  --color-accent-critical: var(--accent-critical);
+  --color-accent-info: var(--accent-info);
+  --font-display: var(--font-display);
+  --font-mono: var(--font-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+  box-sizing: border-box;
+}
+
+html {
+  color-scheme: dark;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background:
+    radial-gradient(ellipse 1200px 600px at 50% -10%, rgba(122, 154, 82, 0.06), transparent),
+    var(--bg);
+  color: var(--text);
+  font-family: var(--font-mono), ui-monospace, monospace;
+  min-height: 100vh;
+}
+
+.font-display {
+  font-family: var(--font-display), sans-serif;
+}
+
+/* Textura sutil de "papel de manifesto" nos painéis */
+.panel-texture {
+  background-image:
+    repeating-linear-gradient(
+      0deg,
+      rgba(255, 255, 255, 0.012) 0px,
+      rgba(255, 255, 255, 0.012) 1px,
+      transparent 1px,
+      transparent 3px
+    );
+}
+
+/* Stencil / carimbo de crate para títulos */
+.stencil-label {
+  font-family: var(--font-display), sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 700;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-panel);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-dim);
+}
+
+@keyframes pulse-critical {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.55; }
+}
+.pulse-critical {
+  animation: pulse-critical 1.6s ease-in-out infinite;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent-warn);
+  outline-offset: 2px;
 }
