@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image"; // 1. Importe o componente Image
 import { Minus, Plus, Trash2 } from "lucide-react";
 import type { Item } from "@/lib/types";
 
@@ -26,19 +27,46 @@ export default function ItemRow({
     onChange(next);
   };
 
+  const getItemImagePath = (itemName: string) => {
+    const formattedName = itemName
+      .replace(/\s+/g, '_')
+      .replace(/[.()]/g, '_')
+      .replace(/_+/g, '_');
+    
+    return `/foxhole_items/images/${formattedName}.png`;
+  };
+
   return (
-    <div className="group flex items-center gap-2 py-1.5 border-b border-(--border-soft) last:border-b-0">
-      <div className="flex-1 min-w-0">
-        <p className="text-sm truncate">{item.name}</p>
-        {item.category && (
-          <p className="text-[10px] uppercase tracking-wide text-(--text-dim)">
-            {item.category}
-          </p>
-        )}
-        <p className="text-[10px] uppercase tracking-wide text-(--text-dim)">
-          {item.isBoxed ? "Em caixa" : "Item solto"}
-        </p>
+    <div className="group flex items-center gap-3 py-1.5 border-b border-(--border-soft) last:border-b-0">
+      {/* 2. Adicione a imagem aqui */}
+      <div className="relative w-8 h-8 shrink-0">
+        <Image
+          src={getItemImagePath(item.name)}
+          alt={item.name}
+          width={32}
+          height={32}
+          className="object-contain"
+          onError={(e) => {
+            // Fallback: se a imagem não existir, exibe um ícone genérico ou esconde
+            e.currentTarget.src = "/foxhole_items/images/Items.png";
+          }}
+        />
       </div>
+
+      <div className="flex-1 min-w-0">
+        <p className="text-sm truncate font-medium">{item.name}</p>
+        <div className="flex gap-2">
+          {item.category && (
+            <p className="text-[10px] uppercase tracking-wide text-(--text-dim)">
+              {item.category}
+            </p>
+          )}
+          <p className="text-[10px] uppercase tracking-wide text-(--text-dim)">
+            {item.isBoxed ? "• Em caixa" : "• Item solto"}
+          </p>
+        </div>
+      </div>
+
       <div className="flex items-center gap-1 shrink-0">
         <button
           onClick={() => bump(-1)}
