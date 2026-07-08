@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Boxes, KanbanSquare } from "lucide-react";
+import Image from "next/image";
 import DepotsPanel from "./depots/DepotsPanel";
 import KanbanBoard from "./kanban/KanbanBoard";
 
@@ -15,11 +16,15 @@ export default function AppShell() {
       <header className="border-b border-(--border) bg-(--bg-panel)/60 backdrop-blur-sm sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-5 pt-5 pb-0">
           <div className="flex items-center gap-3">
-            <div
-              className="w-9 h-9 rounded-sm border-2 flex items-center justify-center shrink-0"
-              style={{ borderColor: "var(--accent-warn)" }}
-            >
-              <Boxes size={18} style={{ color: "var(--accent-warn)" }} />
+            <div className="w-10 h-10 rounded-sm border border-(--border) bg-(--bg-panel-raised) overflow-hidden shrink-0">
+              <Image
+                src="/copom_logo_foxhole.png"
+                alt="COPOM Foxhole"
+                width={40}
+                height={40}
+                className="w-full h-full object-cover"
+                priority
+              />
             </div>
             <div>
               <h1 className="font-display text-2xl uppercase tracking-wider leading-none">

@@ -33,6 +33,8 @@ Acesse **http://localhost:3000**.
 
 > O arquivo `.env` já vem configurado com `DATABASE_URL="file:./dev.db"` (SQLite local). Não é necessário nenhum serviço externo para rodar o projeto.
 
+> Para habilitar a busca de itens da Foxhole Item API no cadastro de stockpiles, defina também `FOXHOLE_ITEM_API_BASE_URL` com a URL base da instância da API que você estiver usando.
+
 ## Trocando para Postgres/MySQL (opcional)
 
 Se quiser usar um banco de verdade (por exemplo para hospedar o app para o regimento inteiro usar), edite:
@@ -70,6 +72,7 @@ src/
 
 - **Depot**: `name`, `region`, `lastRefillAt` (usado para calcular o cronômetro de 3 dias), `notes`, e sua lista de `items`.
 - **Item**: `name`, `quantity`, `category`, vinculado a um `Depot`.
+- **Item**: `name`, `quantity`, `category`, `isBoxed`, vinculado a um `Depot`.
 - **Task**: `title`, `description`, `status` (`TODO` / `IN_PROGRESS` / `DONE`), `priority` (`LOW` / `MEDIUM` / `HIGH`), `order` (posição dentro da coluna).
 
 O cronômetro de cada depósito é calculado no navegador a partir de `lastRefillAt` + 3 dias — clique no ícone de atualizar no card do depósito sempre que ele for reabastecido no jogo, para reiniciar a contagem.

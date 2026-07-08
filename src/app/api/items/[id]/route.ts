@@ -7,7 +7,7 @@ export async function PATCH(
 ) {
   const { id } = await params;
   const body = await req.json();
-  const { name, quantity, category } = body;
+  const { name, quantity, category, isBoxed } = body;
 
   const item = await prisma.item.update({
     where: { id },
@@ -17,6 +17,7 @@ export async function PATCH(
         ? { quantity: Math.max(0, Math.trunc(Number(quantity)) || 0) }
         : {}),
       ...(category !== undefined ? { category: category || null } : {}),
+      ...(isBoxed !== undefined ? { isBoxed: Boolean(isBoxed) } : {}),
     },
   });
 

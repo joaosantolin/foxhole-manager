@@ -3,6 +3,7 @@ export type Item = {
   name: string;
   quantity: number;
   category: string | null;
+  isBoxed: boolean;
   depotId: string;
   createdAt: string;
   updatedAt: string;

@@ -1,5 +1,5 @@
 // Duração do ciclo de refresh de um depósito em Foxhole: 3 dias
-export const REFILL_INTERVAL_MS = 3 * 24 * 60 * 60 * 1000;
+export const REFILL_INTERVAL_MS = 49 * 60 * 60 * 1000;
 
 export const ITEM_CATEGORIES = [
   "Armas",
@@ -10,6 +10,11 @@ export const ITEM_CATEGORIES = [
   "Veículos",
   "Uniformes",
   "Outros",
+] as const;
+
+export const ITEM_PACKAGING_OPTIONS = [
+  { value: false, label: "Item solto" },
+  { value: true, label: "Em caixa" },
 ] as const;
 
 export const TASK_STATUS_LABELS: Record<string, string> = {

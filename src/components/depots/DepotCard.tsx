@@ -18,7 +18,12 @@ export default function DepotCard({
   depot: Depot;
   onRefresh: () => Promise<void>;
   onDelete: () => Promise<void>;
-  onAddItem: (data: { name: string; quantity: number; category: string | null }) => Promise<void>;
+  onAddItem: (data: {
+    name: string;
+    quantity: number;
+    category: string | null;
+    isBoxed: boolean;
+  }) => Promise<void>;
   onChangeItem: (itemId: string, quantity: number) => void;
   onDeleteItem: (itemId: string) => void;
 }) {

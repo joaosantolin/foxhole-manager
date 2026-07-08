@@ -42,7 +42,7 @@ export default function DepotsPanel() {
 
   const addItem = async (
     depotId: string,
-    data: { name: string; quantity: number; category: string | null }
+    data: { name: string; quantity: number; category: string | null; isBoxed: boolean }
   ) => {
     const res = await fetch("/api/items", {
       method: "POST",

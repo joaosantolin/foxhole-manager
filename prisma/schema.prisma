@@ -1,25 +1,26 @@
-// Prisma schema - Foxhole Stock Manager
+// prisma/schema.prisma
 
 generator client {
   provider = "prisma-client"
   output   = "../src/generated/prisma"
 }
 
+// Deixe apenas o provider!
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
 }
 
 /// Um depósito (bunker base / relay station / seaport) em algum ponto do mapa
 model Depot {
-  id            String   @id @default(cuid())
-  name          String   // Nome do local (ex: "The Moors - Bunker Base")
-  region        String?  // Região/hex do mapa (opcional, ex: "Deadlands")
-  lastRefillAt  DateTime @default(now()) // Início da contagem do refresh (3 dias)
-  notes         String?
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id           String   @id @default(cuid())
+  name         String   // Nome do local (ex: "The Moors - Bunker Base")
+  region       String?  // Região/hex do mapa (opcional, ex: "Deadlands")
+  lastRefillAt DateTime @default(now()) // Início da contagem do refresh (3 dias)
+  notes        String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
-  items         Item[]
+  items        Item[]
 }
 
 /// Um item de estoque dentro de um depósito
@@ -28,6 +29,7 @@ model Item {
   name      String   // Nome do item (ex: "Rifle 7.62mm", "Bandagens Básicas")
   quantity  Int      @default(0)
   category  String?  // Categoria opcional (ex: "Armas", "Munição", "Suprimentos Médicos")
+  isBoxed   Boolean  @default(false)
   depotId   String
   depot     Depot    @relation(fields: [depotId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())

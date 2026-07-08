@@ -35,6 +35,9 @@ export default function ItemRow({
             {item.category}
           </p>
         )}
+        <p className="text-[10px] uppercase tracking-wide text-(--text-dim)">
+          {item.isBoxed ? "Em caixa" : "Item solto"}
+        </p>
       </div>
       <div className="flex items-center gap-1 shrink-0">
         <button
