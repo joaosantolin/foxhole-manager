@@ -1,31 +1,56 @@
 import { NextRequest, NextResponse } from "next/server";
+import path from "path";
+import fs from "fs";
 import type { FoxholeItem } from "@/lib/foxhole-items";
 
-const FOXHOLE_API_BASE_URL = process.env.FOXHOLE_ITEM_API_BASE_URL;
-const FOXHOLE_CATALOG_URL = "https://foxholelogi.com/assets/foxhole.json";
-
 export async function GET(req: NextRequest) {
-  const url = new URL(req.url);
-  const searchTerm = url.searchParams.get("q")?.trim().toLowerCase() ?? "";
+  try {
+    const url = new URL(req.url);
+    const searchTerm = url.searchParams.get("q")?.trim().toLowerCase() ?? "";
 
-  const upstream = FOXHOLE_API_BASE_URL
-    ? new URL("/api/v1/items/warden", FOXHOLE_API_BASE_URL).toString()
-    : FOXHOLE_CATALOG_URL;
+    // Caminho para o JSON dentro da pasta public
+    const filePath = path.join(process.cwd(), "public", "foxhole_items", "items.json");
 
-  const response = await fetch(upstream, { cache: "no-store" });
+    if (!fs.existsSync(filePath)) {
+      return NextResponse.json({ error: "JSON não encontrado" }, { status: 500 });
+    }
 
-  if (!response.ok) {
-    return NextResponse.json(
-      { error: "Falha ao consultar a API de itens do Foxhole." },
-      { status: 502 }
-    );
+    const fileContent = fs.readFileSync(filePath, "utf-8");
+    const localItems = JSON.parse(fileContent) as Array<{
+      title: string;
+      image_local_path: string;
+    }>;
+
+    const filtered = localItems
+      .filter((item) => (searchTerm ? item.title.toLowerCase().includes(searchTerm) : true))
+      .sort((left, right) => left.title.localeCompare(right.title));
+
+    const mappedItems: FoxholeItem[] = filtered.map((item, index) => {
+      // 1. Pega o path: "foxhole_items\\images\\00MS_Stinger.png"
+      // 2. Remove o "foxhole_items\\" ou "foxhole_items/"
+      // 3. Resultado final esperado: "images/00MS_Stinger.png"
+      
+      const rawPath = item.image_local_path || "";
+      // Substitui barras invertidas por barras normais para garantir compatibilidade
+      const normalizedPath = rawPath.replace(/\\/g, "/");
+      
+      // Extrai apenas a parte que começa em "images/..."
+      const imagePart = normalizedPath.split("images/").pop();
+      
+      return {
+        _id: `local_${index}`,
+        itemName: item.title,
+        itemCategory: "General",
+        // O caminho final para o navegador: /foxhole_items/images/nome_da_imagem.png
+        imageName: imagePart ? `/foxhole_items/images/${imagePart}` : "/file.svg",
+        faction: ["warden", "colonial"],
+        isMpfCraftable: false,
+      };
+    });
+
+    return NextResponse.json(mappedItems.slice(0, 20));
+  } catch (error) {
+    console.error(error);
+    return NextResponse.json({ error: "Erro interno" }, { status: 500 });
   }
-
-  const items = (await response.json()) as FoxholeItem[];
-  const filtered = items
-    .filter((item) => item.faction?.includes("warden"))
-    .filter((item) => (searchTerm ? item.itemName.toLowerCase().includes(searchTerm) : true))
-    .sort((left, right) => left.itemName.localeCompare(right.itemName));
-
-  return NextResponse.json(filtered.slice(0, 20));
 }

@@ -7,7 +7,9 @@ import type { FoxholeItem } from "@/lib/foxhole-items";
 
 function getItemIconSrc(item: FoxholeItem) {
   const fileName = item.imgName || item.imageName;
-  return fileName ? `https://foxholelogi.com/assets/images/items/${encodeURIComponent(fileName)}` : null;
+  
+  if (!fileName) return null;
+    return fileName;
 }
 
 export default function AddItemForm({
